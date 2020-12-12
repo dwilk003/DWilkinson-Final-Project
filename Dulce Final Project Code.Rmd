@@ -1,0 +1,134 @@
+---
+title: "Dulce Final Project"
+author: "Dulce Wilkinson"
+date: "December 8, 2020"
+output: html_document
+---
+
+```{r}
+#Use point and click with menus to import data. 
+```
+#Rename data so it's easier to work with
+```{r}
+dat <- read_excel("Dulce Final Project Data.xlsx")
+```
+
+#Two Data Cleaning Techniques. I reverse coded two variables. 
+```{r}
+library(car)
+cesd8r<-dat$cesd8<- recode(dat$cesd8, '1=4;2=3;3=2;4=1')
+cesd12r<-dat$cesd12<- recode(dat$cesd12, '1=4;2=3;3=2;4=1')
+```
+
+#Analyses. I created a data frame of my variables of interest, so that I could generate a correlation matrix. I then conducted linear regressions between affective tone and psychological outcomes. 
+
+```{r}
+library(Hmisc)
+datCor<-cbind.data.frame(dat$meimExplore, dat$meimBelong, dat$cesd, dat$energy, dat$emotiolWellBeing, dat$swl, dat$Redemption, dat$Contamition, dat$Tone)
+
+datCorMat <- rcorr(as.matrix(datCor))
+as.data.frame(datCorMat$P)
+as.data.frame(datCorMat$r)
+```
+
+#Correlation matrix with p values.
+```{r}
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+flattenCorrMatrix(datCorMat$r, datCorMat$P)
+```
+
+#Linear Regressions: Affective Tone predicting ethnic racial identity and psychological health variables. 
+
+#Affective tone & Redemption -> meimBelong
+```{r}
+dat$zMeimBelong <- scale(dat$meimBelong)
+lmBelong<- lm(zMeimBelong~Redemption, data=dat)
+summary(lmBelong)
+
+lmBelong2<- lm(zMeimBelong~Tone, data=dat)
+summary(lmBelong2)
+```
+
+#Affective tone & Redemption -> meimExplore
+```{r}
+dat$zMeimExplore <- scale(dat$meimExplore)
+lmExplore<- lm(zMeimExplore~Redemption, data=dat)
+summary(lmBelong)
+
+lmExplore2<- lm(zMeimExplore~Tone, data=dat)
+summary(lmBelong2)
+```
+
+#Affective tone & Redemption -> cesd
+```{r}
+dat$zCesd <- scale(dat$cesd)
+lmCesd<- lm(zCesd~Redemption, data=dat)
+summary(lmCesd)
+
+lmCesd2<- lm(zCesd~Tone, data=dat)
+summary(lmCesd2)
+```
+
+#Affective tone & Redemption -> swl
+```{r}
+
+dat$zSwl <- scale(dat$swl)
+lmSwl<- lm(zSwl~Redemption, data=dat)
+summary(lmSwl)
+
+
+lmSwl2<-lm(zSwl~ Tone, data=dat)
+summary(lmSwl2)
+```
+
+#Affective tone & Redemption -> energy
+```{r}
+dat$zEnergy <- scale(dat$energy)
+lmEnergy<-lm(energy~ Redemption, data=dat)
+summary(lmEnergy)
+
+lmEnergy2<-lm(energy ~ Tone, data=dat)
+summary(lmEnergy2)
+```
+
+#Here, I examined mean differences in redemption and contamination based on ethnicity
+```{r}
+t.test(Redemption~T1_Ethnicity_A, data=dat, var.equal=TRUE)
+```
+
+```{r}
+t.test(Contamition~T1_Ethnicity_A, data=dat, var.equal=TRUE)
+```
+
+#One Graph. I created a frequency bar graph to depict the frequency of redemptive themes between Asian American and Latinx participants. 
+
+```{r}
+cTab <- table(dat$Redemption, dat$T1_Ethnicity_A)
+barplot(cTab, beside=TRUE, legend.text=rownames(cTab), ylab="absolute frequency")
+```
+
+```{r}
+library(reshape2)
+library(ggplot2)
+library(dplyr)
+data_m <- melt(cTab, varnames = c("Red", "Eth"), id.vars = "Red")
+
+ggplot(data_m %>% group_by(Red) %>% 
+           mutate(perc = round(value/sum(value),2)), 
+       aes(x = as.factor(Red), y = perc, 
+           fill = as.factor(Eth), cumulative = TRUE)) +
+    geom_col() +
+    geom_text(aes(label = paste0(perc*100,"%")), 
+              position = position_stack(vjust = 0.5))
+```
+
+
+
