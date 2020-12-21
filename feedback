@@ -1,0 +1,22 @@
+Hi! 
+See below for comments from Jake and I. We’re happy to chat about any questions you have. Thanks for a great quarter and have a nice break! 
+Amanda
+
+Code Book Comments: 
+Overall, looks good! The only recommendation I would make is to explain that the rating scales belong to all items in a scale
+
+Code Comments: 
+Looks good! 
+You can always make a code chunk to load the libraries at the beginning of your code 
+On lines 30/31, you don’t have to write “as.data.frame” to print your columns. 
+
+
+QUESTION FOR JAKE: is it typical to center a dependent variable? I thought that you weren’t supposed to do this, but want to double check before giving feedback
+I thought it was fine and typically scale and center my DVs and IVs, in part so that I can have standardized beta coefficients. But maybe I have been wrong all along haha
+Because you cbind your dataframe with dat$variable for all your variables, your variables all have “dat$” preceding them in the cordataframe, which is maybe not ideal. There’s several ways to avoid this. (1) Subsetting indices for these variables and assigning to new dataframe, (2) doing what you did but renaming the variables after creating the dataframe, (3) doing what you did but assigning names to each variable within dataframe like, “variableName” = dat$variable1
+“Redemption” is a categorical variable but is being modeled in the linear model as a continuous/numeric variable. You’ll want to change that as it affects your inferences quite a bit.
+
+
+Grade: Pass
+
+
